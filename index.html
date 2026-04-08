@@ -2,1279 +2,150 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>WOD Notepad</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zee AI (Groq)</title>
+
 <style>
-:root{
-  --bg:#0a0a0a;--surface:#141414;--surface2:#1c1c1c;--surface3:#222;
-  --border:#2a2a2a;--border2:#333;
-  --gold:#d4a843;--gold2:#f0c96a;--gold-glow:rgba(212,168,67,.25);
-  --text:#ececec;--text2:#888;--text3:#444;
-  --danger:#e05555;--success:#4caf7d;--info:#4a90d9;
-  --radius:16px;--font:'Nunito',sans-serif;
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #0d0d0d;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
-body.light{--bg:#f0ece4;--surface:#fff;--surface2:#f7f3ec;--surface3:#ede7dc;--border:#ddd4c2;--border2:#ccc3b0;--gold:#b8860b;--gold2:#d4a520;--gold-glow:rgba(184,134,11,.15);--text:#1a1a1a;--text2:#666;--text3:#bbb;}
-body.green{--bg:#07100a;--surface:#0c1910;--surface2:#112015;--surface3:#162a1b;--border:#1c3522;--border2:#244428;--gold:#4caf7d;--gold2:#6fcf97;--gold-glow:rgba(76,175,125,.2);--text:#c0f0d0;--text2:#5a9a6a;--text3:#24432a;}
-body.yellow{--bg:#0f0c00;--surface:#1a1500;--surface2:#221d00;--surface3:#2a2400;--border:#3a3000;--border2:#4a3e00;--gold:#f0c030;--gold2:#ffd740;--gold-glow:rgba(240,192,48,.2);--text:#fff8d0;--text2:#b8a030;--text3:#5a4800;}
-body.blue{--bg:#050a12;--surface:#090f1c;--surface2:#0e1628;--surface3:#131d30;--border:#1a2b3e;--border2:#233848;--gold:#4a90d9;--gold2:#64b0f8;--gold-glow:rgba(74,144,217,.2);--text:#c0d0f0;--text2:#5070a0;--text3:#1e3060;}
-body.purple{--bg:#08040f;--surface:#100818;--surface2:#170d22;--surface3:#1e1030;--border:#2c1840;--border2:#3a2050;--gold:#a070d8;--gold2:#c090f8;--gold-glow:rgba(160,112,216,.2);--text:#ddc0f8;--text2:#7850a8;--text3:#3a1860;}
-body.red{--bg:#0f0404;--surface:#1a0808;--surface2:#220d0d;--surface3:#2a1010;--border:#3e1414;--border2:#4e1c1c;--gold:#e05555;--gold2:#f07070;--gold-glow:rgba(224,85,85,.2);--text:#f8d0d0;--text2:#a85050;--text3:#5a2020;}
 
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s;}
-::-webkit-scrollbar{width:3px;height:3px;}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+#chat {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  display: none;
+}
 
-/* SVG ICON HELPER */
-.ico{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
-.ico svg{width:100%;height:100%;}
+.msg {
+  margin: 8px 0;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 80%;
+}
 
-/* TOPBAR */
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:13px 16px 11px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
-.brand{display:flex;align-items:center;gap:10px;}
-.brand-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:10px;display:flex;align-items:center;justify-content:center;}
-.brand-text{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);line-height:1.1;}
-.brand-sub{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:2px;}
-.topbar-icons{display:flex;gap:2px;}
-.icon-btn{background:none;border:none;color:var(--text2);cursor:pointer;padding:7px;border-radius:9px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
-.icon-btn:active{background:var(--border);color:var(--gold);}
-.icon-btn svg{width:20px;height:20px;}
+.user { background: #2563eb; align-self: flex-end; }
+.bot { background: #1f2937; align-self: flex-start; }
 
-/* SEARCH */
-.searchbar{padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;gap:8px;}
-.search-wrap{flex:1;display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:11px;padding:0 12px;transition:border-color .2s;}
-.search-wrap:focus-within{border-color:var(--gold);}
-.search-wrap input{flex:1;background:none;border:none;color:var(--text);font-size:14px;font-family:var(--font);outline:none;padding:9px 0;}
-.search-wrap input::placeholder{color:var(--text3);}
-.view-toggle{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:9px;overflow:hidden;}
-.view-btn{background:none;border:none;color:var(--text2);padding:8px 10px;cursor:pointer;transition:all .2s;display:flex;align-items:center;}
-.view-btn svg{width:17px;height:17px;}
-.view-btn.active{background:var(--gold);color:#000;}
+#inputBox {
+  display: none;
+  padding: 10px;
+  background: #111;
+}
 
-/* STATS */
-.stats-row{display:flex;background:var(--surface);border-bottom:1px solid var(--border);}
-.stat-cell{flex:1;padding:8px 6px;text-align:center;border-right:1px solid var(--border);}
-.stat-cell:last-child{border-right:none;}
-.stat-num{font-size:16px;font-weight:800;color:var(--gold);}
-.stat-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:1px;}
+input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  outline: none;
+  border-radius: 8px;
+}
 
-/* CATEGORY TABS */
-.cat-scroll{display:flex;gap:6px;padding:10px 14px;overflow-x:auto;background:var(--surface2);border-bottom:1px solid var(--border);-webkit-overflow-scrolling:touch;}
-.cat-scroll::-webkit-scrollbar{display:none;}
-.cat-pill{background:var(--bg);border:1px solid var(--border);color:var(--text2);border-radius:20px;padding:6px 14px;font-size:12px;font-family:var(--font);cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0;}
-.cat-pill.active{background:var(--gold);color:#000;border-color:var(--gold);font-weight:700;}
+button {
+  margin-left: 10px;
+  padding: 10px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  border-radius: 8px;
+}
 
-/* SMART TOGGLES BAR */
-.toggles-bar{display:flex;align-items:center;gap:6px;padding:9px 14px;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;}
-.toggles-bar::-webkit-scrollbar{display:none;}
-.toggles-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;flex-shrink:0;margin-right:2px;}
-.toggle-chip{display:flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:5px 10px;cursor:pointer;transition:all .2s;flex-shrink:0;user-select:none;}
-.toggle-chip svg{width:13px;height:13px;color:var(--text3);flex-shrink:0;}
-.toggle-chip span{font-size:11px;color:var(--text2);white-space:nowrap;}
-.toggle-chip .toggle-dot{width:22px;height:13px;border-radius:7px;background:var(--border2);position:relative;transition:background .2s;flex-shrink:0;}
-.toggle-chip .toggle-dot::after{content:'';position:absolute;top:2px;left:2px;width:9px;height:9px;border-radius:50%;background:#fff;transition:transform .2s;}
-.toggle-chip.on{border-color:var(--gold);}
-.toggle-chip.on .toggle-dot{background:var(--gold);}
-.toggle-chip.on .toggle-dot::after{transform:translateX(9px);}
-.toggle-chip.on span{color:var(--gold);}
-.toggle-chip.on svg{color:var(--gold);}
+#setup {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100vh;
+  padding: 20px;
+}
 
-/* NOTES GRID */
-.notes-container{padding:12px 14px;padding-bottom:90px;}
-.notes-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
-.notes-list-view{display:flex;flex-direction:column;gap:8px;}
-
-/* CARD COLORS */
-.card-c0{--cc:#1e2a1e;--cb:#2d4a2d;--ct:#c8f0d4;}
-.card-c1{--cc:#1e1e2e;--cb:#2d2d50;--ct:#c8c8f8;}
-.card-c2{--cc:#2a1e10;--cb:#4a3010;--ct:#f8e0b0;}
-.card-c3{--cc:#2a1010;--cb:#502020;--ct:#f8c0c0;}
-.card-c4{--cc:#10201e;--cb:#1e4040;--ct:#b0f0e8;}
-.card-c5{--cc:#201020;--cb:#402040;--ct:#f0c0f8;}
-.card-c6{--cc:#201800;--cb:#403000;--ct:#fff0a0;}
-.card-c7{--cc:#101828;--cb:#1e3050;--ct:#b0d0f8;}
-.card-c8{--cc:#201510;--cb:#403020;--ct:#f0d8b0;}
-.card-c9{--cc:#0e1e0e;--cb:#183018;--ct:#a0f0b0;}
-
-/* NOTE CARD GRID */
-.note-card{background:var(--cc,var(--surface));border:1px solid var(--cb,var(--border));border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .2s;position:relative;}
-.note-card:active{transform:scale(.97);}
-.note-card-inner{padding:14px 13px 10px;}
-.note-card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;}
-.note-card-title{font-weight:800;font-size:14px;color:var(--ct,var(--text));line-height:1.3;flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.note-card-badges{display:flex;gap:3px;flex-shrink:0;}
-.nc-badge{width:16px;height:16px;opacity:.8;}
-.note-card-preview{font-size:12px;color:var(--ct,var(--text2));opacity:.7;line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:8px;}
-.note-card-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 13px;background:rgba(0,0,0,.2);border-top:1px solid rgba(255,255,255,.05);}
-.note-card-date{font-size:10px;color:var(--ct,var(--text3));opacity:.6;}
-.note-card-actions{display:flex;gap:4px;}
-.nc-btn{background:rgba(255,255,255,.08);border:none;border-radius:6px;padding:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;}
-.nc-btn:active{background:rgba(255,255,255,.25);}
-.nc-btn svg{width:13px;height:13px;color:var(--ct,var(--text2));}
-.nc-btn.del:active{background:rgba(224,85,85,.4);}
-
-/* PENCIL EDIT BUTTON — center of card */
-.nc-edit-btn{position:absolute;bottom:44px;right:12px;width:32px;height:32px;border-radius:50%;background:var(--gold);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.4);transition:transform .2s;}
-.nc-edit-btn:active{transform:scale(.88);}
-.nc-edit-btn svg{width:16px;height:16px;color:#000;}
-
-/* LIST VIEW CARD */
-.note-list-card{background:var(--cc,var(--surface));border:1px solid var(--cb,var(--border));border-left:4px solid var(--gold);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:transform .15s;}
-.note-list-card:active{transform:scale(.99);}
-.nlc-inner{padding:13px 14px;}
-.nlc-title{font-weight:800;font-size:15px;color:var(--ct,var(--text));margin-bottom:4px;}
-.nlc-preview{font-size:13px;color:var(--ct,var(--text2));opacity:.7;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.6;}
-.nlc-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:rgba(0,0,0,.2);border-top:1px solid rgba(255,255,255,.05);}
-.nlc-meta{display:flex;align-items:center;gap:8px;}
-.nlc-date{font-size:11px;color:var(--ct,var(--text3));opacity:.6;}
-.nlc-actions{display:flex;gap:4px;}
-
-/* FAB */
-.fab{position:fixed;bottom:22px;right:18px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;border:none;cursor:pointer;box-shadow:0 4px 24px var(--gold-glow);display:flex;align-items:center;justify-content:center;z-index:200;transition:transform .2s;}
-.fab:active{transform:scale(.9);}
-.fab svg{width:24px;height:24px;}
-
-/* OFFLINE */
-.offline-bar{background:var(--danger);color:#fff;text-align:center;font-size:12px;padding:5px;display:none;}
-.offline-bar.show{display:block;}
-
-/* TOAST */
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--surface);border:1.5px solid var(--gold);color:var(--gold);border-radius:12px;padding:10px 22px;font-size:13px;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center;}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
-/* LOADING */
-.loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:50vh;gap:14px;}
-.spinner{width:38px;height:38px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:40vh;gap:8px;}
-.empty-state svg{width:52px;height:52px;color:var(--text3);}
-.empty-state p{font-size:14px;color:var(--text2);}
-
-/* CARD ANIM */
-@keyframes cardIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-.note-card,.note-list-card{animation:cardIn .22s ease;}
-
-/* ============ FULL SCREEN DISTRACTION-FREE EDITOR ============ */
-.editor-overlay{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);}
-.editor-overlay.open{transform:translateY(0);}
-
-/* Editor Topbar — minimal, hides after 3s */
-.editor-topbar{display:flex;align-items:center;gap:8px;padding:12px 14px 10px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;transition:transform .3s,opacity .3s;}
-.editor-topbar.hidden{transform:translateY(-100%);opacity:0;position:absolute;top:0;left:0;right:0;z-index:10;}
-.back-btn{background:none;border:none;color:var(--gold);cursor:pointer;padding:4px;display:flex;}
-.back-btn svg{width:22px;height:22px;}
-.editor-title-inp{flex:1;background:none;border:none;color:var(--text);font-size:16px;font-weight:700;font-family:'Playfair Display',serif;outline:none;}
-.editor-title-inp::placeholder{color:var(--text3);}
-.save-dot{width:8px;height:8px;border-radius:50%;background:var(--success);opacity:0;transition:opacity .3s;flex-shrink:0;}
-.save-dot.on{opacity:1;}
-.editor-top-btns{display:flex;gap:2px;}
-.etb{background:none;border:none;color:var(--text2);cursor:pointer;padding:6px;border-radius:8px;display:flex;}
-.etb svg{width:19px;height:19px;}
-.etb:active{background:var(--border);color:var(--gold);}
-
-/* Toolbar */
-.editor-toolbar{display:flex;align-items:center;gap:3px;padding:7px 10px;background:var(--surface2);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;-webkit-overflow-scrolling:touch;transition:transform .3s,opacity .3s;}
-.editor-toolbar.hidden{transform:translateY(-110%);opacity:0;position:absolute;top:56px;left:0;right:0;z-index:9;}
-.editor-toolbar::-webkit-scrollbar{display:none;}
-.tb{background:none;border:1px solid var(--border);color:var(--text2);border-radius:7px;padding:5px 8px;font-size:12px;cursor:pointer;white-space:nowrap;font-family:var(--font);transition:all .15s;flex-shrink:0;display:flex;align-items:center;gap:4px;}
-.tb svg{width:13px;height:13px;}
-.tb:active,.tb.on{background:var(--gold);color:#000;border-color:var(--gold);}
-.tb.on svg{color:#000;}
-.tb-sep{width:1px;height:20px;background:var(--border);flex-shrink:0;margin:0 2px;}
-.tb-sel{background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:5px 4px;font-size:11px;font-family:var(--font);outline:none;flex-shrink:0;max-width:60px;}
-
-/* Full-screen tap to show/hide UI */
-.editor-full-tap{position:absolute;top:0;left:0;right:0;height:60px;z-index:5;}
-
-/* Editor Area */
-.editor-page-wrap{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;transition:all .3s;}
-.editor-page-wrap.style-normal{background:transparent;padding:20px 18px;}
-.editor-page-wrap.style-paper{background:var(--surface);margin:12px;border-radius:10px;border:1px solid var(--border);padding:24px 20px;box-shadow:0 4px 24px rgba(0,0,0,.4);}
-.editor-page-wrap.style-lined{background:repeating-linear-gradient(var(--bg),var(--bg) 27px,var(--border) 28px);padding:20px 18px;}
-.editor-page-wrap.style-newspaper{background:var(--surface);margin:12px;border:2px solid var(--border);border-radius:10px;padding:18px;columns:2;column-gap:14px;column-rule:1px solid var(--border);}
-.editor-page-wrap.style-grid{background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:24px 24px;padding:20px 18px;}
-
-.editor-area{width:100%;min-height:60vh;background:transparent;border:none;color:var(--text);font-family:var(--font);font-size:16px;line-height:1.85;outline:none;caret-color:var(--gold);-webkit-user-select:text;user-select:text;}
-.editor-area:empty::before{content:attr(data-placeholder);color:var(--text3);pointer-events:none;font-style:italic;}
-
-/* Statusbar */
-.editor-status{display:flex;align-items:center;gap:10px;padding:7px 14px;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;overflow-x:auto;transition:transform .3s,opacity .3s;}
-.editor-status.hidden{transform:translateY(100%);opacity:0;position:absolute;bottom:0;left:0;right:0;z-index:9;}
-.editor-status::-webkit-scrollbar{display:none;}
-.sb{font-size:11px;color:var(--text3);white-space:nowrap;}
-.sb b{color:var(--text2);}
-.sb-right{margin-left:auto;display:flex;gap:5px;flex-shrink:0;}
-.sb-btn{background:none;border:1px solid var(--border);color:var(--text2);border-radius:6px;padding:4px 9px;font-size:11px;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:4px;}
-.sb-btn svg{width:12px;height:12px;}
-.sb-btn:active{background:var(--gold);color:#000;border-color:var(--gold);}
-
-/* Focus mode dim overlay */
-.focus-hint{position:absolute;bottom:70px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);color:var(--text2);font-size:11px;padding:6px 14px;border-radius:20px;pointer-events:none;opacity:0;transition:opacity .5s;z-index:20;white-space:nowrap;}
-.focus-hint.show{opacity:1;}
-
-/* ============ MODALS ============ */
-.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:600;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
-.modal-backdrop.open{opacity:1;pointer-events:all;}
-.modal{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding:18px 16px 30px;transform:translateY(30px);transition:transform .25s;}
-.modal-backdrop.open .modal{transform:translateY(0);}
-.m-handle{width:36px;height:4px;background:var(--border2);border-radius:4px;margin:0 auto 16px;}
-.modal h2{font-family:'Playfair Display',serif;color:var(--gold);font-size:17px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-.modal h2 svg{width:18px;height:18px;}
-.m-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.m-opt{background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;font-size:12px;color:var(--text2);transition:all .2s;font-family:var(--font);}
-.m-opt:active,.m-opt.active{background:var(--gold);color:#000;border-color:var(--gold);font-weight:700;}
-.m-opt svg{width:22px;height:22px;display:block;margin:0 auto 5px;}
-.m-close{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text2);border-radius:10px;padding:12px;font-size:14px;font-family:var(--font);cursor:pointer;margin-top:12px;}
-.m-close:active{background:var(--border2);}
-.m-btn{width:100%;background:var(--gold);border:none;color:#000;border-radius:10px;padding:12px;font-size:14px;font-weight:700;font-family:var(--font);cursor:pointer;margin-bottom:8px;}
-.m-btn:active{opacity:.8;}
-.m-btn.sec{background:var(--bg);border:1px solid var(--border);color:var(--text2);}
-.font-list{display:flex;flex-direction:column;gap:7px;}
-.f-item{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;font-size:15px;color:var(--text2);transition:all .2s;}
-.f-item:active,.f-item.active{background:var(--gold);color:#000;border-color:var(--gold);}
-.color-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
-.sw{width:36px;height:36px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:transform .15s,border-color .2s;}
-.sw:active,.sw.active{border-color:var(--gold);transform:scale(1.2);}
-.m-section label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:7px;}
-.m-section{margin-bottom:14px;}
-.m-input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:11px 14px;font-size:14px;font-family:var(--font);outline:none;margin-bottom:8px;}
-.m-input:focus{border-color:var(--gold);}
-.stat-row-m{display:flex;justify-content:space-between;align-items:center;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:11px 14px;margin-bottom:6px;}
-.stat-row-m span{font-size:13px;color:var(--text2);}
-.stat-row-m b{color:var(--gold);}
-.template-item{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;margin-bottom:7px;display:flex;align-items:center;gap:12px;transition:border-color .2s;}
-.template-item:active{border-color:var(--gold);}
-.template-item svg{width:22px;height:22px;flex-shrink:0;color:var(--gold);}
-.template-item h4{font-size:14px;color:var(--text);margin-bottom:2px;}
-.template-item p{font-size:12px;color:var(--text2);}
-.trash-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;gap:10px;}
-.trash-item h4{font-size:14px;color:var(--text2);margin-bottom:2px;}
-.trash-item p{font-size:11px;color:var(--text3);}
-.trash-actions{display:flex;gap:6px;flex-shrink:0;}
-.tr-btn{background:var(--bg);border:1px solid var(--border);color:var(--text2);border-radius:7px;padding:7px 10px;font-size:12px;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:4px;}
-.tr-btn svg{width:13px;height:13px;}
-.tr-btn.restore:active{background:var(--success);color:#fff;}
-.tr-btn.perm:active{background:var(--danger);color:#fff;}
-.pin-dots{display:flex;justify-content:center;gap:12px;margin:14px 0;}
-.pin-dot{width:14px;height:14px;border-radius:50%;background:var(--border2);transition:background .2s;}
-.pin-dot.filled{background:var(--gold);}
-.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto;}
-.pin-key{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:18px;font-weight:700;color:var(--text);cursor:pointer;text-align:center;font-family:var(--font);transition:all .15s;}
-.pin-key:active{background:var(--gold);color:#000;border-color:var(--gold);}
-.about-logo{font-family:'Playfair Display',serif;font-size:28px;color:var(--gold);text-align:center;margin-bottom:4px;}
-.about-ver{text-align:center;color:var(--text3);font-size:11px;margin-bottom:18px;letter-spacing:1px;}
-.about-row{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--border);align-items:flex-start;}
-.about-row svg{width:18px;height:18px;color:var(--gold);flex-shrink:0;margin-top:1px;}
-.about-row b{font-size:13px;color:var(--text);}
-.about-row p{font-size:12px;color:var(--text2);line-height:1.5;margin-top:1px;}
-.export-prev{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:13px;color:var(--text2);max-height:150px;overflow-y:auto;margin-bottom:12px;line-height:1.6;white-space:pre-wrap;word-break:break-word;}
-
-/* CONFIRM */
-.confirm-over{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:700;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;}
-.confirm-over.open{opacity:1;pointer-events:all;}
-.confirm-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px 18px;width:100%;max-width:300px;}
-.confirm-box h3{font-family:'Playfair Display',serif;color:var(--gold);margin-bottom:8px;}
-.confirm-box p{font-size:13px;color:var(--text2);margin-bottom:18px;line-height:1.6;}
-.confirm-btns{display:flex;gap:10px;}
-.confirm-btns button{flex:1;padding:11px;border-radius:10px;font-family:var(--font);font-size:14px;cursor:pointer;border:none;font-weight:600;}
-.c-no{background:var(--bg);color:var(--text2);border:1px solid var(--border) !important;}
-.c-yes{background:var(--danger);color:#fff;}
+#setup input {
+  margin-bottom: 10px;
+}
 </style>
 </head>
-<body class="dark">
 
-<div class="offline-bar" id="offlineBar">No internet — changes will sync when connected</div>
-<div class="toast" id="toast"></div>
+<body>
 
-<!-- TOPBAR -->
-<div class="topbar">
-  <div class="brand">
-    <div class="brand-mark">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" width="20" height="20"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-    </div>
-    <div>
-      <div class="brand-text">WOD Notepad</div>
-      <div class="brand-sub">World of Discoveries</div>
-    </div>
-  </div>
-  <div class="topbar-icons">
-    <button class="icon-btn" onclick="openModal('templateModal')" title="Templates">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-    </button>
-    <button class="icon-btn" onclick="openModal('trashModal')" title="Trash">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-    </button>
-    <button class="icon-btn" onclick="openModal('themeModal')" title="Themes">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 017 7c0 3.87-7 13-7 13S5 12.87 5 9a7 7 0 017-7z"/></svg>
-    </button>
-    <button class="icon-btn" onclick="openModal('aboutModal')" title="About">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    </button>
-  </div>
+<div id="setup">
+  <h2>Enter Groq API Key</h2>
+  <input id="apiKeyInput" placeholder="Paste your API key here..." />
+  <button onclick="connect()">Connect</button>
 </div>
 
-<!-- SEARCH -->
-<div class="searchbar">
-  <div class="search-wrap">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3)"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" id="searchInput" placeholder="Search notes…" oninput="filterNotes(this.value)">
-  </div>
-  <div class="view-toggle">
-    <button class="view-btn active" id="vGrid" onclick="setView('grid',this)" title="Grid">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-    </button>
-    <button class="view-btn" id="vList" onclick="setView('list',this)" title="List">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
-  </div>
+<div id="chat"></div>
+
+<div id="inputBox">
+  <input id="input" placeholder="Ask anything..." />
+  <button onclick="send()">Send</button>
 </div>
 
-<!-- STATS -->
-<div class="stats-row">
-  <div class="stat-cell"><div class="stat-num" id="sTotal">0</div><div class="stat-lbl">Notes</div></div>
-  <div class="stat-cell"><div class="stat-num" id="sPinned">0</div><div class="stat-lbl">Pinned</div></div>
-  <div class="stat-cell"><div class="stat-num" id="sWords">0</div><div class="stat-lbl">Words</div></div>
-  <div class="stat-cell"><div class="stat-num" id="sToday">0</div><div class="stat-lbl">Today</div></div>
-</div>
+<script>
+let API_KEY = "";
 
-<!-- CATEGORY TABS -->
-<div class="cat-scroll" id="catScroll">
-  <button class="cat-pill active" onclick="setcat('all',this)">All</button>
-  <button class="cat-pill" onclick="setcat('personal',this)">Personal</button>
-  <button class="cat-pill" onclick="setcat('work',this)">Work</button>
-  <button class="cat-pill" onclick="setcat('ideas',this)">Ideas</button>
-  <button class="cat-pill" onclick="setcat('todo',this)">To-Do</button>
-  <button class="cat-pill" onclick="setcat('diary',this)">Diary</button>
-  <button class="cat-pill" onclick="setcat('important',this)">Important</button>
-</div>
+function connect() {
+  const key = document.getElementById("apiKeyInput").value.trim();
+  if (!key) return alert("Enter API key");
 
-<!-- SMART TOGGLES BAR -->
-<div class="toggles-bar">
-  <span class="toggles-label">Smart</span>
-  <div class="toggle-chip on" id="tgAC" onclick="toggleChip('tgAC','autoCorrect')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-    <span>Auto Correct</span>
-    <div class="toggle-dot"></div>
-  </div>
-  <div class="toggle-chip" id="tgAH" onclick="toggleChip('tgAH','autoHighlight')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><rect x="3" y="11" width="18" height="5" rx="2"/></svg>
-    <span>Auto Highlight</span>
-    <div class="toggle-dot"></div>
-  </div>
-  <div class="toggle-chip" id="tgAB" onclick="toggleChip('tgAB','autoBold')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4h8a4 4 0 010 8H6z"/><path d="M6 12h9a4 4 0 010 8H6z"/></svg>
-    <span>Auto Bold</span>
-    <div class="toggle-dot"></div>
-  </div>
-  <div class="toggle-chip" id="tgNL" onclick="toggleChip('tgNL','newLineAfterDot')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 01-4 4H4"/></svg>
-    <span>New Line on .</span>
-    <div class="toggle-dot"></div>
-  </div>
-  <div class="toggle-chip" id="tgBR" onclick="toggleChip('tgBR','boldBrackets')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H6a2 2 0 00-2 2v5a2 2 0 01-2 2 2 2 0 012 2v5a2 2 0 002 2h2"/><path d="M16 3h2a2 2 0 012 2v5a2 2 0 002 2 2 2 0 00-2 2v5a2 2 0 01-2 2h-2"/></svg>
-    <span>[Bold Brackets]</span>
-    <div class="toggle-dot"></div>
-  </div>
-</div>
+  API_KEY = key;
 
-<!-- NOTES LIST -->
-<div class="notes-container" id="notesContainer">
-  <div class="loading-wrap" id="loadingState">
-    <div class="spinner"></div>
-    <p style="color:var(--text2);font-size:13px;">Loading notes…</p>
-  </div>
-  <div class="notes-grid" id="notesGrid"></div>
-</div>
-
-<button class="fab" onclick="newNote()">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-</button>
-
-<!-- ============ FULL-SCREEN EDITOR ============ -->
-<div class="editor-overlay" id="editorOverlay">
-
-  <!-- TAP ZONE to reveal/hide UI -->
-  <div class="editor-full-tap" id="editorTapZone" onclick="toggleEditorUI()"></div>
-
-  <div class="editor-topbar" id="editorTopbar">
-    <button class="back-btn" onclick="closeEditor()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-    </button>
-    <input type="text" class="editor-title-inp" id="editorTitle" placeholder="Title…" oninput="onTitleInput()" maxlength="100">
-    <div class="save-dot" id="saveDot"></div>
-    <div class="editor-top-btns">
-      <button class="etb" onclick="openModal('catAssignModal')" title="Category">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-      </button>
-      <button class="etb" onclick="toggleLock()" id="lockBtn" title="Lock">
-        <svg id="lockIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-      </button>
-      <button class="etb" onclick="openExport()" title="Share">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-      </button>
-    </div>
-  </div>
-
-  <div class="editor-toolbar" id="editorToolbar">
-    <button class="tb" onclick="cmd('bold')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 4h8a4 4 0 010 8H6z"/><path d="M6 12h9a4 4 0 010 8H6z"/></svg></button>
-    <button class="tb" onclick="cmd('italic')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg></button>
-    <button class="tb" onclick="cmd('underline')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v7a6 6 0 0012 0V3"/><line x1="4" y1="21" x2="20" y2="21"/></svg></button>
-    <button class="tb" onclick="cmd('strikeThrough')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="12" x2="20" y2="12"/><path d="M17.5 5.5C17 4 15.5 3 14 3H9.5A3.5 3.5 0 006 6.5c0 2 1.5 3 3 3.5h6c1.5.5 3 1.5 3 3.5a3.5 3.5 0 01-3.5 3.5H9c-1.5 0-3-1-3.5-2.5"/></svg></button>
-    <div class="tb-sep"></div>
-    <button class="tb" onclick="cmd('insertUnorderedList')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg></button>
-    <button class="tb" onclick="cmd('insertOrderedList')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1.5"/></svg></button>
-    <button class="tb" onclick="insertCheckbox()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></button>
-    <div class="tb-sep"></div>
-    <button class="tb" onclick="cmd('justifyLeft')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg></button>
-    <button class="tb" onclick="cmd('justifyCenter')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg></button>
-    <button class="tb" onclick="cmd('justifyRight')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="6" y1="18" x2="21" y2="18"/></svg></button>
-    <div class="tb-sep"></div>
-    <button class="tb" onclick="openModal('fontModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg></button>
-    <button class="tb" onclick="openModal('colorModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22C6.49 22 2 17.52 2 12S6.49 2 12 2s10 4.04 10 9c0 3.31-2.69 6-6 6h-1.77c-.28 0-.5.22-.5.5 0 .12.05.23.13.33.41.47.64 1.06.64 1.67A2.5 2.5 0 0112 22z"/><circle cx="8.5" cy="10.5" r="1.5" fill="currentColor"/><circle cx="12.5" cy="7.5" r="1.5" fill="currentColor"/><circle cx="16.5" cy="10.5" r="1.5" fill="currentColor"/></svg></button>
-    <button class="tb" onclick="openModal('highlightModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-    <button class="tb" onclick="openModal('pageStyleModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></button>
-    <div class="tb-sep"></div>
-    <select class="tb-sel" onchange="cmd('fontSize',this.value);this.value=''">
-      <option value="">Sz</option>
-      <option value="1">8</option><option value="2">10</option><option value="3">12</option>
-      <option value="4">14</option><option value="5">18</option><option value="6">24</option><option value="7">36</option>
-    </select>
-    <button class="tb" onclick="cmd('removeFormat')" title="Clear format"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><line x1="18" y1="2" x2="22" y2="6"/><line x1="22" y1="2" x2="18" y2="6"/></svg></button>
-  </div>
-
-  <div class="editor-page-wrap style-normal" id="editorPageWrap">
-    <div class="editor-area" id="editorArea" contenteditable="true" spellcheck="true"
-      data-placeholder="Start writing… tap top to show/hide toolbar"
-      oninput="onEditorInput()" onkeydown="handleKeyDown(event)">
-    </div>
-  </div>
-
-  <div class="editor-status" id="editorStatus">
-    <div class="sb">W:<b id="sbW">0</b></div>
-    <div class="sb">C:<b id="sbC">0</b></div>
-    <div class="sb">L:<b id="sbL">1</b></div>
-    <div class="sb" id="sbRT"></div>
-    <div class="sb-right">
-      <button class="sb-btn" onclick="openExport()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-        Share
-      </button>
-      <button class="sb-btn" onclick="openModal('noteStatsModal')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        Stats
-      </button>
-    </div>
-  </div>
-
-  <div class="focus-hint" id="focusHint">Tap top edge to show toolbar</div>
-</div>
-
-<!-- ============ MODALS ============ -->
-
-<!-- THEME -->
-<div class="modal-backdrop" id="themeModal" onclick="outsideClose(event,'themeModal')">
-<div class="modal"><div class="m-handle"></div>
-  <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 017 7c0 3.87-7 13-7 13S5 12.87 5 9a7 7 0 017-7z"/></svg> Theme</h2>
-  <div class="m-grid">
-    <div class="m-opt active" id="tDark" onclick="setTheme('dark','tDark')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>Dark</div>
-    <div class="m-opt" id="tLight" onclick="setTheme('light','tLight')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>Light</div>
-    <div class="m-opt" id="tGreen" onclick="setTheme('green','tGreen')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Forest</div>
-    <div class="m-opt" id="tYellow" onclick="setTheme('yellow','tYellow')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Gold</div>
-    <div class="m-opt" id="tBlue" onclick="setTheme('blue','tBlue')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22a7 7 0 007-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 007 7z"/></svg>Ocean</div>
-    <div class="m-opt" id="tPurple" onclick="setTheme('purple','tPurple')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>Violet</div>
-    <div class="m-opt" id="tRed" onclick="setTheme('red','tRed')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 01-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/></svg>Ember</div>
-  </div>
-  <button class="m-close" onclick="closeModal('themeModal')">Close</button>
-</div></div>
-
-<!-- FONT -->
-<div class="modal-backdrop" id="fontModal" onclick="outsideClose(event,'fontModal')">
-<div class="modal"><div class="m-handle"></div>
-  <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg> Font Style</h2>
-  <div class="font-list">
-    <div class="f-item active" id="fNunito" onclick="setFont('Nunito','fNunito')" style="font-family:Nunito">Nunito — Clean Modern</div>
-    <div class="f-item" id="fPlayfair" onclick="setFont('Playfair Display','fPlayfair')" style="font-family:'Playfair Display'">Playfair Display — Elegant</div>
-    <div class="f-item" id="fMono" onclick="setFont('monospace','fMono')" style="font-family:monospace">Monospace — Code Style</div>
-    <div class="f-item" id="fGeorgia" onclick="setFont('Georgia','fGeorgia')" style="font-family:Georgia">Georgia — Classic Serif</div>
-    <div class="f-item" id="fCursive" onclick="setFont('cursive','fCursive')" style="font-family:cursive">Cursive — Handwritten</div>
-    <div class="f-item" id="fFantasy" onclick="setFont('fantasy','fFantasy')" style="font-family:fantasy">Fantasy — Artistic</div>
-  </div>
-  <button class="m-close" onclick="closeModal('fontModal')">Close</button>
-</div></div>
-
-<!-- TEXT COLOR -->
-<div class="modal-backdrop" id="colorModal" onclick="outsideClose(event,'colorModal')">
-<div class="modal"><div class="m-handle"></div>
-  <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22C6.49 22 2 17.52 2 12S6.49 2 12 2s10 4.04 10 9c0 3.31-2.69 6-6 6h-1.77c-.28 0-.5.22-.5.5 0 .12.05.23.13.33.41.47.64 1.06.64 1.67A2.5 2.5 0 0112 22z"/></svg> Text Color</h2>
-  <div class="m-section"><label>Presets</label>
-    <div class="color-row">
-      <div class="sw" style="background:#ececec" onclick="applyColor('#ececec')"></div>
-      <div class="sw" style="background:#d4a843" onclick="applyColor('#d4a843')"></div>
-      <div class="sw" style="background:#4caf7d" onclick="applyColor('#4caf7d')"></div>
-      <div class="sw" style="background:#e05555" onclick="applyColor('#e05555')"></div>
-      <div class="sw" style="background:#4a90d9" onclick="applyColor('#4a90d9')"></div>
-      <div class="sw" style="background:#a070d8" onclick="applyColor('#a070d8')"></div>
-      <div class="sw" style="background:#f0c030" onclick="applyColor('#f0c030')"></div>
-      <div class="sw" style="background:#f08030" onclick="applyColor('#f08030')"></div>
-      <div class="sw" style="background:#ff69b4" onclick="applyColor('#ff69b4')"></div>
-      <div class="sw" style="background:#00bcd4" onclick="applyColor('#00bcd4')"></div>
-    </div>
-  </div>
-  <div class="m-section"><label>Custom</label>
-    <input type="color" id="custColor" value="#ececec" onchange="applyColor(this.value)" style="width:100%;height:44px;border:1px solid var(--border);border-radius:10px;background:var(--bg);cursor:pointer;">
-  </div>
-  <button class="m-close" onclick="closeModal('colorModal')">Close</button>
-</div></div>
-
-<!-- HIGHLIGHT -->
-<div class="modal-backdrop" id="highlightModal" onclick="outsideClose(event,'highlightModal')">
-<div class="modal"><div class="m-handle"></div>
-  <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Highlight Color</h2>
-  <div class="color-row">
-    <div class="sw" style="background:#ffd740" onclick="applyHL('#ffd740')"></div>
-    <div class="sw" style="background:#a5d6a7" onclick="applyHL('#a5d6a7')"></div>
-    <div class="sw" style="background:#90caf9" onclick="applyHL('#90caf9')"></div>
-    <div class="sw" style="background:#f48fb1" onclick="applyHL('#f48fb1')"></div>
-    <div class="sw" style="background:#ce93d8" onclick="applyHL('#ce93d8')"></div>
-    <div class="sw" style="background:#ffcc80" onclick="applyHL('#ffcc80')"></div>
-    <div class="sw" style="background:transparent;border:2px dashed var(--border2);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--text2)" onclick="applyHL('transparent')">✕</div>
-  </div>
-  <button class="m-close" onclick="closeModal('highlightModal')">Close</button>
-</div></div>
-
-<!-- PAGE STYLE -->
-<div class="modal-backdrop" id="pageStyleModal" onclick="outsideClose(event,'pageStyleModal')">
-<div class="modal"><div class="m-handle"></div>
-  <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Page Style</h2>
-  <div class="m-grid">
-    <div class="m-opt active" id="psNormal" onclick="setPage('normal','psNormal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Normal</div>
-    <div class="m-opt" id="psPaper" onclick="setPage('paper','psPaper')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>Paper</div>
-    <div class="m-opt" id="psLined" onclick="setPage('lined','psLined')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="8" x2="21" y2="8"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="16" x2="21" y2="16"/></svg>Lined</div>
-    <div class="m-opt" id="psNewspaper" onclick="setPage('newspaper','psNewspaper')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/></svg>Newspaper</div>
-    <div class="m-opt" id="psGrid" onclick="setPage('grid','psGrid')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Grid</div>
-  </div>
-  <button class="m-close" onclick="closeModal('pageStyleModal')">Close</button>
-</div></div>
-
-<!-- CATEGORY ASSIGN -->
-<div class="modal-backdrop" id="catAssignModal" onclick="outsideClose(event,'catAssignModal')">
-<div class="modal"><div class="m-handle"></div>
-  <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> Category</h2>
-  <div class="m-grid">
-    <div class="m-opt" onclick="assignCat('personal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Personal</div>
-    <div class="m-opt" onclick="assignCat('work')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>Work</div>
-    <div class="m-opt" onclick="assignCat('ideas')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Ideas</div>
-    <div class="m-opt" onclick="assignCat('todo')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>To-Do</div>
-    <div class="m-opt" onclick="assignCat('diary')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Diary</div>
-    <div class="m-opt" onclick="assignCat('important')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Important</div>
-  </div>
-  <button class="m-close" onclick="closeModal('catAssignModal')">Close</button>
-</div></div>
-
-<!-- TEMPLATES -->
-<div class="modal-backdrop" id="templateModal" onclick="outsideClose(event,'templateModal')">
-<div class="modal"><div class="m-handle"></div>
-  <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Templates</h2>
-  <div id="templateList"></div>
-  <button class="m-close" onclick="closeModal('templateModal')">Close</button>
-</div></div>
-
-<!-- EXPORT -->
-<div class="modal-backdrop" id="exportModal" onclick="outsideClose(event,'exportModal')">
-<div class="modal"><div class="m-handle"></div>
-  <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Export & Share</h2>
-  <div class="export-prev" id="exportPrev"></div>
-  <button class="m-btn" onclick="shareNote()">Share via Apps</button>
-  <button class="m-btn sec" onclick="copyNote()">Copy to Clipboard</button>
-  <button class="m-btn sec" onclick="downloadTxt()">Download as .txt</button>
-  <button class="m-close" onclick="closeModal('exportModal')">Close</button>
-</div></div>
-
-<!-- NOTE STATS -->
-<div class="modal-backdrop" id="noteStatsModal" onclick="outsideClose(event,'noteStatsModal')">
-<div class="modal"><div class="m-handle"></div>
-  <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Note Statistics</h2>
-  <div id="noteStatsContent"></div>
-  <button class="m-close" onclick="closeModal('noteStatsModal')">Close</button>
-</div></div>
-
-<!-- TRASH -->
-<div class="modal-backdrop" id="trashModal" onclick="outsideClose(event,'trashModal')">
-<div class="modal"><div class="m-handle"></div>
-  <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg> Trash (30-day recovery)</h2>
-  <div id="trashList"></div>
-  <button class="m-btn sec" id="emptyTrBtn" onclick="emptyTrash()" style="display:none">Empty Trash</button>
-  <button class="m-close" onclick="closeModal('trashModal')">Close</button>
-</div></div>
-
-<!-- PIN -->
-<div class="modal-backdrop" id="pinModal" onclick="outsideClose(event,'pinModal')">
-<div class="modal"><div class="m-handle"></div>
-  <h2 id="pinTitle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Set PIN</h2>
-  <p id="pinSub" style="font-size:13px;color:var(--text2);text-align:center;margin-bottom:10px;">Enter 4-digit PIN</p>
-  <div class="pin-dots" id="pinDots">
-    <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
-    <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
-  </div>
-  <div class="pin-pad">
-    <button class="pin-key" onclick="pinKey('1')">1</button><button class="pin-key" onclick="pinKey('2')">2</button><button class="pin-key" onclick="pinKey('3')">3</button>
-    <button class="pin-key" onclick="pinKey('4')">4</button><button class="pin-key" onclick="pinKey('5')">5</button><button class="pin-key" onclick="pinKey('6')">6</button>
-    <button class="pin-key" onclick="pinKey('7')">7</button><button class="pin-key" onclick="pinKey('8')">8</button><button class="pin-key" onclick="pinKey('9')">9</button>
-    <button class="pin-key" onclick="pinClear()">⌫</button><button class="pin-key" onclick="pinKey('0')">0</button><button class="pin-key" onclick="closeModal('pinModal')">✕</button>
-  </div>
-  <p id="pinErr" style="color:var(--danger);font-size:13px;text-align:center;margin-top:10px;display:none;">Wrong PIN!</p>
-</div></div>
-
-<!-- ABOUT -->
-<div class="modal-backdrop" id="aboutModal" onclick="outsideClose(event,'aboutModal')">
-<div class="modal"><div class="m-handle"></div>
-  <div class="about-logo">WOD Notepad</div>
-  <div class="about-ver">V3.0 • WORLD OF DISCOVERIES • HENRY TALLEN</div>
-  <div class="about-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><div><b>Smart Toggles</b><p>Auto Correct, Auto Highlight, Auto Bold, New Line on period, Bold Brackets — all switchable</p></div></div>
-  <div class="about-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><div><b>Color Grid Cards</b><p>Each note gets a unique color for easy identity in grid or list view</p></div></div>
-  <div class="about-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H6a2 2 0 00-2 2v5a2 2 0 01-2 2 2 2 0 012 2v5a2 2 0 002 2h2"/><path d="M16 3h2a2 2 0 012 2v5a2 2 0 002 2 2 2 0 00-2 2v5a2 2 0 01-2 2h-2"/></svg><div><b>Distraction-Free Editor</b><p>Tap pencil for full screen. Tap top to toggle toolbar. Pure writing focus.</p></div></div>
-  <div class="about-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/></svg><div><b>Firebase Sync</b><p>Everything stored permanently in Firebase Realtime Database</p></div></div>
-  <div class="about-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg><div><b>PIN Lock</b><p>Protect any note with a 4-digit PIN</p></div></div>
-  <div class="about-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg><div><b>Trash Bin</b><p>30-day recovery for deleted notes before permanent purge</p></div></div>
-  <button class="m-close" onclick="closeModal('aboutModal')">Close</button>
-</div></div>
-
-<!-- CONFIRM -->
-<div class="confirm-over" id="confirmOver">
-  <div class="confirm-box">
-    <h3 id="cfTitle">Confirm</h3>
-    <p id="cfMsg">Are you sure?</p>
-    <div class="confirm-btns">
-      <button class="c-no" onclick="closeConfirm()">Cancel</button>
-      <button class="c-yes" id="cfYes" onclick="runConfirm()">Confirm</button>
-    </div>
-  </div>
-</div>
-
-<!-- ============ FIREBASE + APP SCRIPT ============ -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, remove, onValue, push, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const app = initializeApp({ databaseURL:"https://smart-talks-a045c-default-rtdb.firebaseio.com/" });
-const db = getDatabase(app);
-const NR = "wod_notepad/notes", TR = "wod_notepad/trash";
-
-// ── State ──
-let notes = {}, trash = {};
-let currentId = null, saveTimer = null;
-let currentFont = 'Nunito', currentCat = 'all', sortMode = 'date';
-let viewMode = 'grid';
-let confirmCb = null;
-let pinBuffer = '', pinMode = null, pinTargetId = null, unlockCb = null;
-let editorUIVisible = true, editorUITimer = null;
-
-// ── Smart Toggle State ──
-const smartToggles = {
-  autoCorrect: JSON.parse(localStorage.getItem('tg_autoCorrect') ?? 'true'),
-  autoHighlight: JSON.parse(localStorage.getItem('tg_autoHighlight') ?? 'false'),
-  autoBold: JSON.parse(localStorage.getItem('tg_autoBold') ?? 'false'),
-  newLineAfterDot: JSON.parse(localStorage.getItem('tg_newLineAfterDot') ?? 'false'),
-  boldBrackets: JSON.parse(localStorage.getItem('tg_boldBrackets') ?? 'false'),
-};
-
-// Auto-correct dictionary
-const AC = {
-  teh:'the',dont:"don't",cant:"can't",wont:"won't",isnt:"isn't",arent:"aren't",
-  wasnt:"wasn't",werent:"weren't",ive:"I've",im:"I'm",id:"I'd",ill:"I'll",
-  youre:"you're",theyre:"they're",weve:"we've",hes:"he's",shes:"she's",
-  thats:"that's",whats:"what's",theres:"there's",youll:"you'll",theyll:"they'll",
-  recieve:'receive',beleive:'believe',occured:'occurred',untill:'until',
-  definately:'definitely',seperate:'separate',accomodate:'accommodate',
-  tommorow:'tomorrow',becaus:'because',adress:'address',freind:'friend',
-  wierd:'weird',relevent:'relevant',existance:'existence',alot:'a lot',
-  occassion:'occasion',independance:'independence',experiance:'experience',
-  noone:'no one',infomation:'information',succesfull:'successful',
-  doenst:"doesn't",doesnt:"doesn't",wouldnt:"wouldn't",couldnt:"couldn't",
-  shouldnt:"shouldn't",hadnt:"hadn't",hasnt:"hasn't",havent:"haven't",
-};
-
-// Highlight keyword patterns
-const HL_WORDS = /\b(important|note|todo|warning|attention|urgent|reminder|deadline|key|critical|must|remember|action|task|priority)\b/gi;
-
-// Card colors (10 unique)
-const CARD_COLORS = ['card-c0','card-c1','card-c2','card-c3','card-c4','card-c5','card-c6','card-c7','card-c8','card-c9'];
-
-// Templates
-const TEMPLATES = [
-  {title:'Meeting Notes',cat:'work',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',body:'<b>Meeting:</b> <br><b>Date:</b> <br><b>Attendees:</b> <br><hr><b>Agenda:</b><br><br><b>Key Points:</b><br><br><b>Action Items:</b><br>'},
-  {title:'Diary Entry',cat:'diary',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>',body:'<b>Date:</b> <br><b>Mood:</b> <br><hr><br>'},
-  {title:'To-Do List',cat:'todo',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>',body:'<b>Tasks</b><br><br>☐ <br>☐ <br>☐ <br>☐ <br>'},
-  {title:'Goal Planner',cat:'ideas',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',body:'<b>Goal:</b> <br><b>Deadline:</b> <br><hr><b>Why it matters:</b><br><br><b>Steps:</b><br>1. <br>2. <br>3. <br>'},
-  {title:'Idea Capture',cat:'ideas',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',body:'<b>Idea:</b> <br><hr><b>Problem solved:</b><br><br><b>How:</b><br><br><b>Next step:</b><br>'},
-  {title:'Quick Note',cat:'personal',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',body:''},
-];
-
-// ── Boot ──
-applyTheme(localStorage.getItem('wod_theme') || 'dark');
-initTogglesUI();
-loadTemplates();
-initOffline();
-onValue(ref(db, NR), s => { notes = s.val() || {}; render(); updateStats(); document.getElementById('loadingState').style.display='none'; });
-onValue(ref(db, TR), s => {
-  trash = s.val() || {};
-  const now = Date.now();
-  Object.entries(trash).forEach(([id, n]) => { if (now - (n.deletedAt||0) > 30*864e5) remove(ref(db,`${TR}/${id}`)); });
-});
-
-// ── RENDER ──
-function render(filter = document.getElementById('searchInput').value) {
-  const grid = document.getElementById('notesGrid');
-  grid.innerHTML = '';
-  let arr = Object.entries(notes).map(([id,n]) => ({id,...n}));
-  if (filter) { const q=filter.toLowerCase(); arr=arr.filter(n=>(n.title||'').toLowerCase().includes(q)||(n.textContent||'').toLowerCase().includes(q)); }
-  if (currentCat !== 'all') arr = arr.filter(n => n.category === currentCat);
-  arr.sort((a,b) => {
-    if (a.pinned && !b.pinned) return -1;
-    if (!a.pinned && b.pinned) return 1;
-    if (sortMode === 'title') return (a.title||'').localeCompare(b.title||'');
-    return (b.updatedAt||0) - (a.updatedAt||0);
-  });
-
-  const container = document.getElementById('notesContainer');
-  if (!arr.length) {
-    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><p>${filter?'No matching notes':'No notes yet'}</p></div>`;
-    return;
-  }
-
-  grid.className = viewMode === 'grid' ? 'notes-grid' : 'notes-list-view';
-
-  arr.forEach((note, idx) => {
-    const cc = CARD_COLORS[idx % CARD_COLORS.length];
-    const rt = Math.max(1, Math.ceil((note.wordCount||0)/200));
-    if (viewMode === 'grid') {
-      const card = document.createElement('div');
-      card.className = `note-card ${cc}`;
-      card.innerHTML = `
-        <div class="note-card-inner">
-          <div class="note-card-header">
-            <div class="note-card-title">${esc(note.title||'Untitled')}</div>
-            <div class="note-card-badges">
-              ${note.pinned?`<svg class="nc-badge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>`:''}
-              ${note.locked?`<svg class="nc-badge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>`:''}
-            </div>
-          </div>
-          <div class="note-card-preview">${esc((note.textContent||'').substring(0,100))}</div>
-        </div>
-        <div class="note-card-footer">
-          <span class="note-card-date">${fmtDate(note.updatedAt)} · ~${rt}m</span>
-          <div class="note-card-actions">
-            <button class="nc-btn" onclick="event.stopPropagation();togglePin('${note.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></button>
-            <button class="nc-btn del" onclick="event.stopPropagation();askDel('${note.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg></button>
-          </div>
-        </div>
-        <button class="nc-edit-btn" onclick="event.stopPropagation();editNote('${note.id}')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        </button>`;
-      card.querySelector('.note-card-inner').addEventListener('click', () => editNote(note.id));
-      grid.appendChild(card);
-    } else {
-      const card = document.createElement('div');
-      card.className = `note-list-card ${cc}`;
-      card.innerHTML = `
-        <div class="nlc-inner">
-          <div class="nlc-title">${esc(note.title||'Untitled')} ${note.pinned?'📌':''} ${note.locked?'🔐':''}</div>
-          <div class="nlc-preview">${esc((note.textContent||'').substring(0,120))}</div>
-        </div>
-        <div class="nlc-footer">
-          <div class="nlc-meta">
-            <span class="nlc-date">${fmtDate(note.updatedAt)} · ~${rt}m</span>
-            ${note.category?`<span style="font-size:11px;background:rgba(255,255,255,.1);padding:2px 8px;border-radius:10px;color:inherit;opacity:.7">${note.category}</span>`:''}
-          </div>
-          <div class="nlc-actions">
-            <button class="nc-btn" onclick="event.stopPropagation();editNote('${note.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
-            <button class="nc-btn" onclick="event.stopPropagation();togglePin('${note.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></button>
-            <button class="nc-btn" onclick="event.stopPropagation();shareById('${note.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
-            <button class="nc-btn del" onclick="event.stopPropagation();askDel('${note.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button>
-          </div>
-        </div>`;
-      card.querySelector('.nlc-inner').addEventListener('click', () => editNote(note.id));
-      grid.appendChild(card);
-    }
-  });
+  document.getElementById("setup").style.display = "none";
+  document.getElementById("chat").style.display = "block";
+  document.getElementById("inputBox").style.display = "flex";
 }
 
-function updateStats() {
-  const arr = Object.values(notes);
-  document.getElementById('sTotal').textContent = arr.length;
-  document.getElementById('sPinned').textContent = arr.filter(n=>n.pinned).length;
-  document.getElementById('sWords').textContent = arr.reduce((s,n)=>s+(n.wordCount||0),0);
-  const t = new Date().toDateString();
-  document.getElementById('sToday').textContent = arr.filter(n=>n.updatedAt && new Date(n.updatedAt).toDateString()===t).length;
-}
+async function send() {
+  const input = document.getElementById("input");
+  if (!input.value) return;
 
-// ── VIEW TOGGLE ──
-window.setView = function(mode, el) {
-  viewMode = mode;
-  document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  render();
-};
+  addMessage(input.value, "user");
 
-// ── NEW / EDIT ──
-window.newNote = function() {
-  currentId = null;
-  document.getElementById('editorTitle').value = '';
-  document.getElementById('editorArea').innerHTML = '';
-  document.getElementById('editorArea').style.fontFamily = currentFont;
-  setPageSilent('normal');
-  updateCounts();
-  showEditorOverlay();
-};
+  const userText = input.value;
+  input.value = "";
 
-window.editNote = function(id) {
-  const n = notes[id];
-  if (!n) return;
-  if (n.locked) { askPin('unlock', id, ()=>openEditor(id)); return; }
-  openEditor(id);
-};
+  const loading = addMessage("Thinking...", "bot");
 
-function openEditor(id) {
-  const n = notes[id];
-  currentId = id;
-  document.getElementById('editorTitle').value = n.title||'';
-  document.getElementById('editorArea').innerHTML = n.content||'';
-  document.getElementById('editorArea').style.fontFamily = n.font||currentFont;
-  setPageSilent(n.pageStyle||'normal');
-  document.getElementById('lockIcon').setAttribute('d', n.locked
-    ? 'M17 1l-5 5-5-5M12 6v12M5 11a7 7 0 0014 0'
-    : 'M7 11V7a5 5 0 0110 0v4');
-  updateCounts();
-  showEditorOverlay();
-}
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + API_KEY,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "llama3-70b-8192",
+        messages: [
+          { role: "user", content: userText }
+        ]
+      })
+    });
 
-function showEditorOverlay() {
-  document.getElementById('editorOverlay').classList.add('open');
-  showEditorUI(true);
-  setTimeout(()=>{ document.getElementById('editorArea').focus(); showFocusHint(); }, 400);
-}
+    const data = await res.json();
+    loading.remove();
 
-window.closeEditor = function() {
-  clearTimeout(saveTimer);
-  doSave();
-  document.getElementById('editorOverlay').classList.remove('open');
-  currentId = null;
-};
+    const reply = data.choices[0].message.content;
+    addMessage(reply, "bot");
 
-// ── DISTRACTION-FREE TOGGLE ──
-window.toggleEditorUI = function() { showEditorUI(!editorUIVisible); };
-
-function showEditorUI(show) {
-  editorUIVisible = show;
-  const tb = document.getElementById('editorTopbar');
-  const tl = document.getElementById('editorToolbar');
-  const st = document.getElementById('editorStatus');
-  if (show) {
-    tb.classList.remove('hidden'); tl.classList.remove('hidden'); st.classList.remove('hidden');
-    clearTimeout(editorUITimer);
-  } else {
-    tb.classList.add('hidden'); tl.classList.add('hidden'); st.classList.add('hidden');
+  } catch (e) {
+    loading.innerText = "Error connecting...";
   }
 }
 
-function showFocusHint() {
-  const h = document.getElementById('focusHint');
-  h.classList.add('show');
-  setTimeout(()=>h.classList.remove('show'), 3000);
-}
-
-// ── SAVE ──
-function doSave() {
-  const area = document.getElementById('editorArea');
-  const titleEl = document.getElementById('editorTitle');
-  const content = area.innerHTML;
-  const text = area.innerText||area.textContent||'';
-  let title = titleEl.value.trim();
-  if (!title && text.trim()) { title = text.trim().split('\n')[0].substring(0,60); titleEl.value=title; }
-  if (!title) title = 'Untitled';
-  if (!text.trim()) return;
-  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-  const data = {
-    title, content,
-    textContent: text.substring(0,600), wordCount: words,
-    font: area.style.fontFamily||currentFont,
-    pageStyle: getCurPage(),
-    category: currentId?(notes[currentId]?.category||''):'',
-    locked: currentId?(notes[currentId]?.locked||false):false,
-    pin: currentId?(notes[currentId]?.pin||''):'',
-    pinned: currentId?(notes[currentId]?.pinned||false):false,
-    updatedAt: Date.now(),
-    createdAt: currentId?(notes[currentId]?.createdAt||Date.now()):Date.now()
-  };
-  if (currentId) { set(ref(db,`${NR}/${currentId}`),data); }
-  else { const r=push(ref(db,NR)); currentId=r.key; set(r,data); }
-  const dot = document.getElementById('saveDot');
-  dot.classList.add('on'); setTimeout(()=>dot.classList.remove('on'),1800);
-}
-
-window.onEditorInput = function() { updateCounts(); clearTimeout(saveTimer); saveTimer=setTimeout(doSave,700); };
-window.onTitleInput = function() { clearTimeout(saveTimer); saveTimer=setTimeout(doSave,700); };
-
-// ── SMART TOGGLES ──
-window.toggleChip = function(elId, key) {
-  smartToggles[key] = !smartToggles[key];
-  localStorage.setItem(`tg_${key}`, smartToggles[key]);
-  const el = document.getElementById(elId);
-  el.classList.toggle('on', smartToggles[key]);
-};
-
-function initTogglesUI() {
-  const map = {tgAC:'autoCorrect',tgAH:'autoHighlight',tgAB:'autoBold',tgNL:'newLineAfterDot',tgBR:'boldBrackets'};
-  Object.entries(map).forEach(([elId,key]) => {
-    document.getElementById(elId).classList.toggle('on', smartToggles[key]);
-  });
-}
-
-// ── KEY HANDLER ──
-window.handleKeyDown = function(e) {
-  if (e.key === ' ' || e.key === 'Enter') {
-    if (smartToggles.autoCorrect) autoCorrect();
-    if (smartToggles.newLineAfterDot) checkNewLineAfterDot(e);
-    if (smartToggles.boldBrackets) checkBoldBrackets();
-    if (smartToggles.autoBold) checkAutoBold(e);
-  }
-  if (smartToggles.autoHighlight && e.key === ' ') setTimeout(runAutoHighlight, 0);
-};
-
-// Auto Correct
-function autoCorrect() {
-  const sel = window.getSelection();
-  if (!sel||!sel.rangeCount) return;
-  const r = sel.getRangeAt(0);
-  const node = r.startContainer;
-  if (node.nodeType !== Node.TEXT_NODE) return;
-  const text = node.textContent, pos = r.startOffset;
-  const before = text.substring(0,pos).trimEnd();
-  const word = before.split(/\s+/).pop().toLowerCase().replace(/[^a-z']/g,'');
-  if (!word||!AC[word]) return;
-  const rep = AC[word];
-  const idx = before.lastIndexOf(word);
-  if (idx<0) return;
-  node.textContent = text.substring(0,idx)+rep+text.substring(idx+word.length);
-  const nr = document.createRange();
-  nr.setStart(node, idx+rep.length); nr.collapse(true);
-  sel.removeAllRanges(); sel.addRange(nr);
-}
-
-// Auto Highlight keywords
-function runAutoHighlight() {
-  const area = document.getElementById('editorArea');
-  const text = area.innerText;
-  if (!text.trim()) return;
-  // Just mark the last typed word if it's a keyword
-  const sel = window.getSelection();
-  if (!sel||!sel.rangeCount) return;
-  const node = sel.getRangeAt(0).startContainer;
-  if (node.nodeType !== Node.TEXT_NODE) return;
-  const before = node.textContent.substring(0, sel.getRangeAt(0).startOffset).trimEnd();
-  const lastWord = before.split(/\s+/).pop();
-  if (lastWord && /^(important|note|todo|warning|attention|urgent|reminder|deadline|key|critical|must|remember|action|task|priority)$/i.test(lastWord)) {
-    const idx = before.lastIndexOf(lastWord);
-    if (idx < 0) return;
-    const range = document.createRange();
-    range.setStart(node, idx); range.setEnd(node, idx+lastWord.length);
-    sel.removeAllRanges(); sel.addRange(range);
-    document.execCommand('hiliteColor', false, '#ffd740');
-    // move cursor to end of word
-    range.setStart(node, idx+lastWord.length); range.collapse(true);
-    sel.removeAllRanges(); sel.addRange(range);
-  }
-}
-
-// Auto Bold after period (new sentence)
-function checkAutoBold(e) {
-  // When Enter is pressed after a sentence ending with . ! ?
-  if (e.key !== 'Enter') return;
-  const sel = window.getSelection();
-  if (!sel||!sel.rangeCount) return;
-  const node = sel.getRangeAt(0).startContainer;
-  if (node.nodeType !== Node.TEXT_NODE) return;
-  const before = node.textContent.substring(0, sel.getRangeAt(0).startOffset).trim();
-  if (/[.!?]$/.test(before)) {
-    setTimeout(()=>{ document.execCommand('bold',false,null); }, 10);
-  }
-}
-
-// New line after full stop
-function checkNewLineAfterDot(e) {
-  // Handled via space after ". " pattern
-  const sel = window.getSelection();
-  if (!sel||!sel.rangeCount) return;
-  const node = sel.getRangeAt(0).startContainer;
-  if (node.nodeType !== Node.TEXT_NODE) return;
-  const before = node.textContent.substring(0, sel.getRangeAt(0).startOffset);
-  // if last 2 chars are ". " insert line break
-  if (before.endsWith('. ') && e.key === ' ') {
-    e.preventDefault();
-    document.execCommand('insertParagraph');
-  }
-}
-
-// Bold words inside [brackets]
-function checkBoldBrackets() {
-  const sel = window.getSelection();
-  if (!sel||!sel.rangeCount) return;
-  const node = sel.getRangeAt(0).startContainer;
-  if (node.nodeType !== Node.TEXT_NODE) return;
-  const text = node.textContent;
-  const pos = sel.getRangeAt(0).startOffset;
-  const before = text.substring(0, pos);
-  const match = before.match(/\[([^\]]+)\]\s?$/);
-  if (!match) return;
-  const fullMatch = match[0];
-  const inner = match[1];
-  const start = before.length - fullMatch.length;
-  // Replace [word] with bolded word
-  const range = document.createRange();
-  range.setStart(node, start);
-  range.setEnd(node, pos);
-  sel.removeAllRanges(); sel.addRange(range);
-  document.execCommand('delete');
-  document.execCommand('bold',false,null);
-  document.execCommand('insertText',false,inner);
-  document.execCommand('bold',false,null);
-}
-
-function updateCounts() {
-  const text = document.getElementById('editorArea').innerText||'';
-  const w = text.trim() ? text.trim().split(/\s+/).length : 0;
-  document.getElementById('sbW').textContent = w;
-  document.getElementById('sbC').textContent = text.length;
-  document.getElementById('sbL').textContent = Math.max(1, text.split('\n').length);
-  document.getElementById('sbRT').innerHTML = `~<b>${Math.max(1,Math.ceil(w/200))}min</b>`;
-}
-
-// ── COMMANDS ──
-window.cmd = function(c,v) { document.getElementById('editorArea').focus(); document.execCommand(c,false,v||null); };
-window.insertCheckbox = function() {
-  const cb = document.createElement('input');
-  cb.type='checkbox'; cb.style.cssText='margin-right:6px;accent-color:var(--gold);width:15px;height:15px;cursor:pointer;';
-  const sel=window.getSelection();
-  if (sel&&sel.rangeCount) { const r=sel.getRangeAt(0); r.insertNode(document.createTextNode(' ')); r.insertNode(cb); }
-};
-window.applyColor = function(c) { cmd('foreColor',c); closeModal('colorModal'); };
-window.applyHL = function(c) { c==='transparent'?cmd('removeFormat'):cmd('hiliteColor',c); closeModal('highlightModal'); };
-
-// ── FONT ──
-window.setFont = function(f,id) {
-  document.querySelectorAll('.f-item').forEach(el=>el.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  currentFont = f;
-  document.getElementById('editorArea').style.fontFamily = f;
-  closeModal('fontModal'); doSave();
-};
-
-// ── PAGE ──
-window.setPage = function(s,id) {
-  document.querySelectorAll('#pageStyleModal .m-opt').forEach(el=>el.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  setPageSilent(s); closeModal('pageStyleModal'); doSave();
-};
-function setPageSilent(s) { document.getElementById('editorPageWrap').className=`editor-page-wrap style-${s}`; }
-function getCurPage() { return document.getElementById('editorPageWrap').className.replace('editor-page-wrap style-',''); }
-
-// ── CATEGORY ──
-window.setcat = function(cat,el) {
-  document.querySelectorAll('.cat-pill').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active'); currentCat = cat; render();
-};
-window.assignCat = function(cat) {
-  if (currentId) update(ref(db,`${NR}/${currentId}`),{category:cat});
-  showToast(`Category: ${cat}`); closeModal('catAssignModal');
-};
-
-// ── PIN ──
-window.togglePin = function(id) {
-  const np = !notes[id]?.pinned;
-  update(ref(db,`${NR}/${id}`),{pinned:np});
-  showToast(np?'Pinned':'Unpinned');
-};
-
-// ── DELETE → TRASH ──
-window.askDel = function(id) { confirmCb=()=>moveToTrash(id); openConfirm('Move to Trash?','Recoverable for 30 days.'); };
-function moveToTrash(id) {
-  const n=notes[id]; if (!n) return;
-  const r=push(ref(db,TR)); set(r,{...n,deletedAt:Date.now(),originalId:id});
-  remove(ref(db,`${NR}/${id}`)); showToast('Moved to trash');
-}
-
-// ── TRASH ──
-window.openModal = function(id) {
-  if (id==='trashModal') renderTrash();
-  if (id==='exportModal') prepExport();
-  if (id==='noteStatsModal') renderStats();
-  document.getElementById(id).classList.add('open');
-};
-
-function renderTrash() {
-  const list=document.getElementById('trashList');
-  const btn=document.getElementById('emptyTrBtn');
-  const arr=Object.entries(trash).map(([id,n])=>({id,...n})).sort((a,b)=>(b.deletedAt||0)-(a.deletedAt||0));
-  if (!arr.length) { list.innerHTML='<p style="color:var(--text2);font-size:13px;text-align:center;padding:20px 0">Trash is empty</p>'; btn.style.display='none'; return; }
-  btn.style.display='block';
-  list.innerHTML = arr.map(n=>`
-    <div class="trash-item">
-      <div><h4>${esc(n.title||'Untitled')}</h4><p>Deleted: ${fmtDate(n.deletedAt)}</p></div>
-      <div class="trash-actions">
-        <button class="tr-btn restore" onclick="restoreTrash('${n.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Restore</button>
-        <button class="tr-btn perm" onclick="permDel('${n.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      </div>
-    </div>`).join('');
-}
-
-window.restoreTrash = function(tid) {
-  const n=trash[tid]; if(!n) return;
-  const {deletedAt,originalId,...rest}=n;
-  const r=push(ref(db,NR)); set(r,{...rest,updatedAt:Date.now()});
-  remove(ref(db,`${TR}/${tid}`)); showToast('Note restored!'); renderTrash();
-};
-window.permDel = function(tid) { confirmCb=()=>{remove(ref(db,`${TR}/${tid}`));renderTrash();showToast('Permanently deleted');}; openConfirm('Delete Forever?','This cannot be undone.'); };
-window.emptyTrash = function() { confirmCb=()=>{remove(ref(db,TR));showToast('Trash emptied');renderTrash();}; openConfirm('Empty Trash?','All trashed notes permanently deleted.'); };
-
-// ── PIN LOCK ──
-window.toggleLock = function() {
-  if (!currentId) doSave();
-  setTimeout(()=>{
-    const n=notes[currentId]; if(!n) return;
-    if (n.locked) { askPin('unlock',currentId,()=>{ update(ref(db,`${NR}/${currentId}`),{locked:false,pin:''}); showToast('Note unlocked'); }); }
-    else { pinMode='set'; pinTargetId=currentId; pinBuffer=''; updatePinDots(); document.getElementById('pinModal').classList.add('open'); }
-  },100);
-};
-function askPin(mode,id,cb) { pinMode=mode; pinTargetId=id; unlockCb=cb; pinBuffer=''; updatePinDots(); document.getElementById('pinErr').style.display='none'; document.getElementById('pinModal').classList.add('open'); }
-window.pinKey = function(d) { if (pinBuffer.length>=4) return; pinBuffer+=d; updatePinDots(); if (pinBuffer.length===4) setTimeout(processPIN,180); };
-window.pinClear = function() { pinBuffer=pinBuffer.slice(0,-1); updatePinDots(); };
-function updatePinDots() { for (let i=0;i<4;i++) document.getElementById(`pd${i}`).className='pin-dot'+(i<pinBuffer.length?' filled':''); }
-function processPIN() {
-  if (pinMode==='set') { update(ref(db,`${NR}/${pinTargetId}`),{locked:true,pin:pinBuffer}); showToast('Note locked!'); closeModal('pinModal'); pinBuffer=''; }
-  else {
-    if (notes[pinTargetId]?.pin===pinBuffer) { closeModal('pinModal'); pinBuffer=''; if(unlockCb) unlockCb(); }
-    else { document.getElementById('pinErr').style.display='block'; pinBuffer=''; updatePinDots(); }
-  }
-}
-
-// ── EXPORT ──
-window.openExport = function() {
-  prepExport();
-  document.getElementById('exportModal').classList.add('open');
-};
-function prepExport() {
-  const title = document.getElementById('editorTitle').value || (currentId&&notes[currentId]?.title)||'Note';
-  const text = document.getElementById('editorArea').innerText || (currentId&&notes[currentId]?.textContent)||'';
-  document.getElementById('exportPrev').textContent = `${title}\n${'─'.repeat(28)}\n${text.substring(0,300)}${text.length>300?'…':''}`;
-}
-window.shareNote = function() {
-  const title=document.getElementById('editorTitle').value||'Note';
-  const text=document.getElementById('editorArea').innerText||'';
-  if (navigator.share) navigator.share({title:`WOD: ${title}`,text:`${title}\n\n${text}`});
-  else { navigator.clipboard?.writeText(`${title}\n\n${text}`); showToast('Copied!'); }
-  closeModal('exportModal');
-};
-window.copyNote = function() {
-  const title=document.getElementById('editorTitle').value||'Note';
-  const text=document.getElementById('editorArea').innerText||'';
-  navigator.clipboard?.writeText(`${title}\n\n${text}`);
-  showToast('Copied to clipboard!'); closeModal('exportModal');
-};
-window.downloadTxt = function() {
-  const title=document.getElementById('editorTitle').value||'note';
-  const text=document.getElementById('editorArea').innerText||'';
-  const blob=new Blob([`${title}\n${'='.repeat(36)}\n\n${text}`],{type:'text/plain'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download=`${title.replace(/[^a-z0-9]/gi,'_')}.txt`; a.click();
-  showToast('Downloaded!'); closeModal('exportModal');
-};
-window.shareById = function(id) {
-  const n=notes[id]; if(!n) return;
-  if (n.locked) { showToast('Note is locked'); return; }
-  if (navigator.share) navigator.share({title:`WOD: ${n.title}`,text:`${n.title}\n\n${n.textContent}`});
-  else { navigator.clipboard?.writeText(`${n.title}\n\n${n.textContent}`); showToast('Copied!'); }
-};
-
-// ── NOTE STATS ──
-function renderStats() {
-  const text=document.getElementById('editorArea').innerText||'';
-  const words=text.trim()?text.trim().split(/\s+/):[];
-  const sentences=text.split(/[.!?]+/).filter(s=>s.trim().length>0);
-  const paras=text.split(/\n\n+/).filter(p=>p.trim().length>0);
-  const unique=new Set(words.map(w=>w.toLowerCase().replace(/[^a-z]/g,''))).size;
-  const freq={}; words.forEach(w=>{const k=w.toLowerCase().replace(/[^a-z]/g,'');if(k.length>3)freq[k]=(freq[k]||0)+1;});
-  const top=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  document.getElementById('noteStatsContent').innerHTML=[
-    row('Word Count',words.length), row('Characters',text.length),
-    row('Sentences',sentences.length), row('Paragraphs',paras.length),
-    row('Unique Words',unique), row('Reading Time',`~${Math.max(1,Math.ceil(words.length/200))} min`),
-    row('Speaking Time',`~${Math.max(1,Math.ceil(words.length/130))} min`),
-    top.length?`<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:4px"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Top Words</div>${top.map(([w,c])=>`<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text2);padding:3px 0"><span>${w}</span><b style="color:var(--gold)">${c}×</b></div>`).join('')}</div>`:''
-  ].join('');
-}
-function row(l,v){return `<div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:11px 14px;margin-bottom:5px"><span style="font-size:13px;color:var(--text2)">${l}</span><b style="color:var(--gold)">${v}</b></div>`;}
-
-// ── TEMPLATES ──
-function loadTemplates() {
-  document.getElementById('templateList').innerHTML = TEMPLATES.map((t,i)=>`
-    <div class="template-item" onclick="useTemplate(${i})">${t.icon}<div><h4>${t.title}</h4><p>${t.cat} template</p></div></div>`).join('');
-}
-window.useTemplate = function(i) {
-  const t=TEMPLATES[i]; closeModal('templateModal'); currentId=null;
-  document.getElementById('editorTitle').value=t.title;
-  document.getElementById('editorArea').innerHTML=t.body;
-  setPageSilent('normal'); updateCounts(); showEditorOverlay();
-  setTimeout(()=>{ doSave(); if(currentId&&t.cat) update(ref(db,`${NR}/${currentId}`),{category:t.cat}); },800);
-};
-
-// ── THEME ──
-window.setTheme = function(t,id) {
-  document.querySelectorAll('#themeModal .m-opt').forEach(el=>el.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  applyTheme(t); closeModal('themeModal');
-};
-function applyTheme(t) {
-  document.body.className=t; localStorage.setItem('wod_theme',t);
-  const map={dark:'tDark',light:'tLight',green:'tGreen',yellow:'tYellow',blue:'tBlue',purple:'tPurple',red:'tRed'};
-  if (map[t]) { document.querySelectorAll('#themeModal .m-opt').forEach(el=>el.classList.remove('active')); const el=document.getElementById(map[t]); if(el) el.classList.add('active'); }
-}
-
-// ── FILTER ──
-window.filterNotes = function(q) { render(q); };
-
-// ── OFFLINE ──
-function initOffline() {
-  const bar=document.getElementById('offlineBar');
-  window.addEventListener('offline',()=>bar.classList.add('show'));
-  window.addEventListener('online',()=>bar.classList.remove('show'));
-  if (!navigator.onLine) bar.classList.add('show');
-}
-
-// ── MODALS ──
-window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); };
-window.outsideClose = function(e,id) { if(e.target.classList.contains('modal-backdrop')) closeModal(id); };
-
-// ── CONFIRM ──
-function openConfirm(title,msg) { document.getElementById('cfTitle').textContent=title; document.getElementById('cfMsg').textContent=msg; document.getElementById('confirmOver').classList.add('open'); }
-window.closeConfirm = function() { document.getElementById('confirmOver').classList.remove('open'); confirmCb=null; };
-window.runConfirm = function() { if(confirmCb) confirmCb(); closeConfirm(); };
-
-// ── TOAST ──
-function showToast(msg) {
-  const t=document.getElementById('toast'); t.textContent=msg;
-  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500);
-}
-
-// ── HELPERS ──
-function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function fmtDate(ts){
-  if(!ts) return '';
-  const d=new Date(ts),now=new Date();
-  if(d.toDateString()===now.toDateString()) return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+function addMessage(text, type) {
+  const chat = document.getElementById("chat");
+  const msg = document.createElement("div");
+  msg.className = "msg " + type;
+  msg.innerText = text;
+  chat.appendChild(msg);
+  chat.scrollTop = chat.scrollHeight;
+  return msg;
 }
 </script>
+
 </body>
 </html>
